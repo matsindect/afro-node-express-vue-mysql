@@ -1,0 +1,22 @@
+form(action="/portal/register", method="post")
+    table
+        tr 
+            td Username
+            td
+                input(type="text" name='user_name')
+        tr
+            td Email
+            td 
+                input(type="email", name="user_email_address")
+        tr
+            td Password
+            td 
+                input(type="password", name="user_password")
+        tr 
+            td Confirm Password
+            td
+                input(type="text" name='confirm-password')
+        tr
+            td
+            td 
+                input(type="submit", value="Register")
