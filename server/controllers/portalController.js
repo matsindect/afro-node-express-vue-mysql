@@ -1,10 +1,10 @@
-const mysqlConnect = require('./dbConnect');
+const mysqlConnect = require('../core/dbConnect');
 const bcrypt = require('bcrypt');
 
 function User() {}
 
 User.prototype = {
-  find: function(user, callback) {
+  find: (user, callback) => {
     // if (user) {
     //   var field = Number.isInteger(user) ? 'id' : 'user_name';
     // }
@@ -13,12 +13,11 @@ User.prototype = {
 
     mysqlConnect.query(sql, user, (err, result) => {
       if (err) throw err;
-      console.log(result);
       callback(result);
     });
   },
 
-  create: function(body, callback) {
+  create: (body, callback) => {
     let pwd = body.user_password;
     body.user_password = bcrypt.hashSync(pwd, 10);
 
@@ -33,11 +32,10 @@ User.prototype = {
     );
   },
 
-  login: function(user_name, user_password, callback) {
+  login: (user_name, user_password, callback) => {
     this.find(user_name, user => {
       if (user) {
-        console.log(user);
-        if (bcrypt.compareSync(user_password, user.user_password)) {
+        if (bcrypt.compareSync(user_password, user[0].user_password)) {
           callback(user);
           return;
         }

@@ -1,4 +1,5 @@
 const express = require('express');
+const session = require('express-session');
 const path = require('path');
 const bodyparser = require('body-parser');
 const morgan = require('morgan');
@@ -6,7 +7,7 @@ const morgan = require('morgan');
 const server = express();
 
 const userRouter = require('./routes/userRoutes');
-const userPortal = require('./routes/userPortal');
+const userPortal = require('./routes/portalRoutes');
 
 server.use(express.urlencoded({ extended: false }));
 
@@ -16,6 +17,18 @@ server.use(express.static(path.join(__dirname, 'public')));
 // Template engine
 server.set('views', path.join(__dirname, 'views'));
 server.set('view engine', 'pug');
+
+// Session
+server.use(
+  session({
+    secret: 'you_tube_video',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 60 * 1000 * 30
+    }
+  })
+);
 
 server.use(bodyparser.json());
 if (process.env.NNODE_ENV === 'development') {
