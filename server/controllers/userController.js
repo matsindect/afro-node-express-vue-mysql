@@ -1,16 +1,5 @@
 const mysqlConnect = require('./dbConnect');
 
-// exports.checkId = (req, res, next, val) => {
-//   console.log(res);
-//   if (req.params.id * 1 > res.length) {
-//     return res.status(404).send({
-//       status: 'Failed',
-//       message: 'Invalid id'
-//     });
-//   }
-//   next();
-// };
-
 exports.getUsers = (req, res) => {
   mysqlConnect.query('SELECT*FROM users', (err, rows, fields) => {
     if (!err) res.send(rows);
