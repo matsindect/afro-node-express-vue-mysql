@@ -1,63 +1,91 @@
-const mysqlConnect = require('./dbConnect');
+const User = require('../models/userModel');
 
-exports.getUsers = (req, res) => {
-  mysqlConnect.query('SELECT*FROM users', (err, rows, fields) => {
-    if (!err) res.send(rows);
-    else console.log(err);
-  });
+exports.createUser = async (req, res) => {
+  try {
+    const newUser = await User.create(req.body);
+    res.status(201).send({
+      status: 'success',
+      data: {
+        user: newUser
+      }
+    });
+  } catch (err) {
+    res.status(400).send({
+      status: 'Fail',
+      massage: err
+    });
+  }
+};
+exports.getUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+
+    res.status(200).send({
+      status: 'Success',
+      results: users.length,
+      data: {
+        users
+      }
+    });
+  } catch (err) {
+    res.status(400).send({
+      status: 'Failed',
+      message: err
+    });
+  }
 };
 
-exports.getUser = (req, res) => {
-  mysqlConnect.query(
-    'SELECT*FROM users WHERE user_id = ?',
-    [req.params.id],
-    (err, rows, fields) => {
-      if (!err) res.send(rows);
-      else console.log(err);
-    }
-  );
+exports.getUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    // const user = await User.findOne({user_name: req.params.user_name});
+    res.status(200).send({
+      status: 'Success',
+      data: {
+        user
+      }
+    });
+  } catch (err) {
+    res.status(400).send({
+      status: 'Failed',
+      message: err
+    });
+  }
 };
 
-exports.deleteUser = (req, res) => {
-  mysqlConnect.query(
-    'DELETE FROM users WHERE user_id = ?',
-    [req.params.id],
-    (err, rows, fields) => {
-      if (!err) res.send(`User ${req.params.id} has been deleted!!`);
-      else console.log(err);
-    }
-  );
+exports.deleteUser = async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    // const user = await User.findOneAndDelete({user_name: req.params.user_name});
+    res.status(204).send({
+      status: 'Success',
+      data: null
+    });
+  } catch (err) {
+    res.status(400).send({
+      status: 'Failed',
+      message: err
+    });
+  }
 };
 
-exports.createUser = (req, res) => {
-  user = req.body;
-  let post_sql =
-    'SET @user_id = ?; SET @user_name = ?; SET @user_email_address = ?; SET @user_password = ?;\
-    CALL createEditUser (@user_id, @user_name, @user_email_address, @user_password)';
-  mysqlConnect.query(
-    post_sql,
-    [user.user_id, user.user_name, user.user_email_address, user.user_password],
-    (err, rows, fields) => {
-      if (!err)
-        rows.forEach(element => {
-          if (element.constructor == Array)
-            res.send(`User id : ${element[0].user_id} has been inserted`);
-        });
-      else console.log(err);
-    }
-  );
-};
-exports.updateUser = (req, res) => {
-  user = req.body;
-  let post_sql =
-    'SET @user_id = ?; SET @user_name = ?; SET @user_email_address = ?; SET @user_password = ?;\
-    CALL createEditUser (@user_id, @user_name, @user_email_address, @user_password)';
-  mysqlConnect.query(
-    post_sql,
-    [user.user_id, user.user_name, user.user_email_address, user.user_password],
-    (err, rows, fields) => {
-      if (!err) res.send(`User id : ${user.user_id} updated successfully`);
-      else console.log(err);
-    }
-  );
+exports.updateUser = async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true
+    });
+    // const user = await User.findOne({user_name: req.params.user_name});
+    res.status(200).send({
+      status: 'Success',
+      data: {
+        user
+      }
+    });
+  } catch (err) {
+    res.status(400).send({
+      status: 'Failed',
+      message: err
+    });
+  }
 };
