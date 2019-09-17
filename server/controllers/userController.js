@@ -18,7 +18,27 @@ exports.createUser = async (req, res) => {
 };
 exports.getUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    // BUILD THE QUERY
+    // Excluding some keys from the search query
+    const queryObject = { ...req.query };
+    const removeFields = ['page', 'sort', 'limit', 'fields'];
+    removeFields.forEach(field => delete queryObject[field]);
+
+    //Advanced filtering
+    let regStr = JSON.stringify(queryObject);
+    regStr = regStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+
+    let query = User.find(JSON.parse(regStr));
+
+    //Sort the query
+    if (req.query.sort) {
+      //sort(filed1, field2..)
+      const sortBy = req.query.sort.split(',').join('');
+      query = query.sort(sortBy);
+    }
+
+    //EXECUTE A QUERY
+    const users = await query;
 
     res.status(200).send({
       status: 'Success',

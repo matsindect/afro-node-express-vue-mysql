@@ -6,12 +6,12 @@ const router = express.Router();
 router
   .route('/')
   .get(userController.getUsers)
-  .post(userController.createUser)
-  .patch(userController.updateUser);
+  .post(userController.createUser);
 
 router
   .route('/:id')
   .get(userController.getUser)
-  .delete(userController.deleteUser);
+  .delete(userController.deleteUser)
+  .patch(userController.updateUser);
 
 module.exports = router;
