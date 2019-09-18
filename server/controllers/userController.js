@@ -1,4 +1,5 @@
 const User = require('../models/userModel');
+const APIresourceFunc = require('../utils/APIresourceFunc');
 
 exports.createUser = async (req, res) => {
   try {
@@ -16,29 +17,17 @@ exports.createUser = async (req, res) => {
     });
   }
 };
+
 exports.getUsers = async (req, res) => {
   try {
-    // BUILD THE QUERY
-    // Excluding some keys from the search query
-    const queryObject = { ...req.query };
-    const removeFields = ['page', 'sort', 'limit', 'fields'];
-    removeFields.forEach(field => delete queryObject[field]);
-
-    //Advanced filtering
-    let regStr = JSON.stringify(queryObject);
-    regStr = regStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
-
-    let query = User.find(JSON.parse(regStr));
-
-    //Sort the query
-    if (req.query.sort) {
-      //sort(filed1, field2..)
-      const sortBy = req.query.sort.split(',').join('');
-      query = query.sort(sortBy);
-    }
-
     //EXECUTE A QUERY
-    const users = await query;
+    const apiHelpers = new APIresourceFunc(User.find(), req.query)
+      .AdvancedFilter()
+      .sort()
+      .fieldSort()
+      .paginate();
+
+    const users = await apiHelpers.query;
 
     res.status(200).send({
       status: 'Success',
